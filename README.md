@@ -1,6 +1,6 @@
 # Sistema de Gerenciamento de Expedição Espacial
 
-Este documento descreve o projeto da disciplina de Sistema de Gerenciamento de Expedição Espacial, que consiste na implementação de um sistema para administrar o cadastro de missões de expedições espaciais.
+Este documento descreve o projeto da disciplina de Desenvolvimento Rápido em Python, que consiste na implementação de um sistema para administrar o cadastro de missões de expedições espaciais.
 
 ## Descrição Geral
 
