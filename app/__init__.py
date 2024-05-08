@@ -7,9 +7,10 @@ api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crud.db'
 db = SQLAlchemy(app)
 
-from app.models.mission import Missions as MissionModel
+from app.models.mission import Mission
 with app.app_context(): 
     db.create_all()
 
-from app.views.missions_view import MissionsView
+from app.views.missions_view import MissionsView, MissionDetailView
 api.add_resource(MissionsView, "/missions")
+api.add_resource(MissionDetailView, "/missions/<int:id>")

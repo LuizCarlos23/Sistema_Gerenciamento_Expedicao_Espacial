@@ -1,6 +1,6 @@
 from app import db
 
-class Missions(db.Model):
+class Mission(db.Model):
     __tablename__ = 'missions'
     __table_args__ = {'sqlite_autoincrement': True} 
     id = db.Column(db.Integer, primary_key=True)
@@ -25,24 +25,39 @@ class Missions(db.Model):
         self.cost = cost
         self.status_description = status_description
 
+    def getById(self, id):
+        try:
+            mission = db.session.query(Mission).filter(Mission.id==id).first()
+            return mission
+        except Exception as e:
+            print(e)
+
+
+    def list(self):
+        try:
+            missions = db.session.query(Mission).all()
+            return missions
+        except Exception as e:
+            print(e)
+
     def save(self, name, launch_date, destination, status, crew, payload, duration, cost, status_description):
         try:
-            add_banco = Missions(name, launch_date, destination, status, crew, payload, duration, cost, status_description)
+            add_banco = Mission(name, launch_date, destination, status, crew, payload, duration, cost, status_description)
             db.session.add(add_banco)
             db.session.commit()
         except Exception as e: 
             print(e)
 
-    def update(self, id, **kwargs):
+    def update(self, id, updated_data = {}):
         try:
-            db.session.query(Missions).filter(Missions.id==id).update(kwargs)
+            db.session.query(Mission).filter(Mission.id==id).update(updated_data)
             db.session.commit()
         except Exception as e:
             print(e)
 
     def remove(self, id):
         try:
-            db.session.query(Missions).filter(Missions.id==id).delete()
+            db.session.query(Mission).filter(Mission.id==id).delete()
             db.session.commit()
         except Exception as e:
             print(e)

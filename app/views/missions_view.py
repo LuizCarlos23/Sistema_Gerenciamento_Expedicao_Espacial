@@ -1,41 +1,123 @@
 from datetime import datetime
 from flask import jsonify, make_response
 from flask_restful import Resource, reqparse
-from app.models.mission import Missions
+from app.models.mission import Mission
+import json
 
 requestArgsPost = reqparse.RequestParser() #definir os argumentos da solicitação HTTP
-requestArgsPost.add_argument('name', type=str, help='Name of the mission', required=True)
-requestArgsPost.add_argument('launch_date', type=str, help='Launch date of the mission (YYYY-MM-DD)', required=True)
-requestArgsPost.add_argument('destination', type=str, help='Destination of the mission', required=True)
-requestArgsPost.add_argument('status', type=str, help='Status of the mission', required=True)
-requestArgsPost.add_argument('crew', type=str, help='Crew members of the mission', required=True)
-requestArgsPost.add_argument('payload', type=str, help='Payload of the mission', required=True)
-requestArgsPost.add_argument('duration', type=str, help='Duration of the mission', required=True)
-requestArgsPost.add_argument('cost', type=float, help='Cost of the mission', required=True)
-requestArgsPost.add_argument('status_description', type=str, help='Description of the mission status', required=True)
+requestArgsPost.add_argument("name", type=str, help="Name of the mission", required=True)
+requestArgsPost.add_argument("launch_date", type=str, help="Launch date of the mission (YYYY-MM-DD)", required=True)
+requestArgsPost.add_argument("destination", type=str, help="Destination of the mission", required=True)
+requestArgsPost.add_argument("status", type=str, help="Status of the mission", required=True)
+requestArgsPost.add_argument("crew", type=str, help="Crew members of the mission", required=True)
+requestArgsPost.add_argument("payload", type=str, help="Payload of the mission", required=True)
+requestArgsPost.add_argument("duration", type=str, help="Duration of the mission", required=True)
+requestArgsPost.add_argument("cost", type=float, help="Cost of the mission", required=True)
+requestArgsPost.add_argument("status_description", type=str, help="Description of the mission status", required=True)
+
+requestArgsUpdate = reqparse.RequestParser()
+requestArgsUpdate.add_argument("id", type=str, help="Id of the mission")
+requestArgsUpdate.add_argument("name", type=str, help="Name of the mission")
+requestArgsUpdate.add_argument("launch_date", type=str, help="Launch date of the mission (DD/MM/YYYY)")
+requestArgsUpdate.add_argument("destination", type=str, help="Destination of the mission")
+requestArgsUpdate.add_argument("status", type=str, help="Status of the mission")
+requestArgsUpdate.add_argument("crew", type=str, help="Crew members of the mission")
+requestArgsUpdate.add_argument("payload", type=str, help="Payload of the mission")
+requestArgsUpdate.add_argument("duration", type=str, help="Duration of the mission")
+requestArgsUpdate.add_argument("cost", type=float, help="Cost of the mission")
+requestArgsUpdate.add_argument("status_description", type=str, help="Description of the mission status")
+
+requestArgsDelete = reqparse.RequestParser()
+requestArgsDelete.add_argument("id", type=str, help="Id of the mission", required=True)
+
+class MissionDetailView(Resource):
+    def get(self, id):
+        try:
+            mission = Mission.getById(self, id)
+            if (mission is None): 
+                return make_response(jsonify(), 404)
+            
+            serialized_mission = {
+                "id": mission.id,
+                "name": mission.name,
+                "launch_date": mission.launch_date.strftime("%d/%m/%Y"), 
+                "destination": mission.destination,
+                "status": mission.status,
+                "crew": mission.crew,
+                "payload": mission.payload,
+                "duration": mission.duration,
+                "cost": float(mission.cost),
+                "status_description": mission.status_description
+            }
+
+            return make_response(jsonify({"mission": serialized_mission}), 200)
+        except Exception as e:
+            print("Ocorreu um error na listagem")
+            print(e)
+            return make_response(jsonify({"msg": "Internal Error"}), 500)
 
 class MissionsView(Resource):
     def get(self):
-        return jsonify("All missions")
-    
+        try:
+            missions = Mission.list(self)
+            serialized_missions = []
+            for mission in missions:
+                serialized_mission = {
+                    "id": mission.id,
+                    "name": mission.name,
+                    "launch_date": mission.launch_date.strftime("%d/%m/%Y"), 
+                    "destination": mission.destination,
+                    "status": mission.status
+                }
+                serialized_missions.append(serialized_mission)
+
+            return make_response(jsonify({"missions": serialized_missions}), 200)
+        except Exception as e:
+            print("Ocorreu um error na listagem")
+            print(e)
+            return make_response(jsonify({"msg": "Internal Error"}), 500)
+
     def post(self):
         try:
-            datas = requestArgsPost.parse_args()
-            print(datas)
-            datetime_str = datas['launch_date']
-            launch_date = datetime.strptime(datetime_str, '%d/%m/%Y')
-            Missions.save(self, datas['name'], launch_date, datas['destination'], datas['status'], 
-                                   datas['crew'], datas['payload'], datas['duration'], datas['cost'], datas['status_description'])
+            data = requestArgsPost.parse_args()
+            datetime_str = data["launch_date"]
+            launch_date = datetime.strptime(datetime_str, "%d/%m/%Y")
+            Mission.save(self, data["name"], launch_date, data["destination"], data["status"], 
+                                   data["crew"], data["payload"], data["duration"], data["cost"], data["status_description"])
 
-            return make_response(jsonify({"message": 'Mission create successfully!'}), 201)
+            return make_response(jsonify({"msg": "Mission create successfully!"}), 201)
         except Exception as e:
             print("Ocorreu um error")
             print(e)
-            return make_response(jsonify({'status': 500, 'msg': "Internal Error"}), 500)
+            return make_response(jsonify({"msg": "Internal Error"}), 500)
     
-    def update(self):
-        return jsonify("Edite mission")
+    def put(self):
+        try:
+            data = requestArgsUpdate.parse_args()
+            
+            if (data["launch_date"] is not None):
+                datetime_str = data["launch_date"]
+                data["launch_date"] = datetime.strptime(datetime_str, "%d/%m/%Y")
+
+            # Pra remover os valores None do dicionario
+            filtered = {k: v for k, v in data.items() if v is not None} 
+            data.clear()
+            data.update(filtered)
+
+            Mission.update(self, data["id"], data)
+            return make_response(jsonify({"msg": "Mission updated successfully!"}), 201)
+        except Exception as e:
+            print("Ocorreu um error ao atualizar a missão")
+            print(e)
+            return make_response(jsonify({"msg": "Internal Error"}), 500)
+
 
     def delete(self):
-        return jsonify("Delete mission")
-    
+        try:
+            data = requestArgsDelete.parse_args()
+            Mission.remove(self, data["id"])
+            return make_response(jsonify({"msg": "Mission deleted successfully!"}), 200)
+        except Exception as e:
+            print("Ocorreu um error ao deletar a missão")
+            print(e)
+            return make_response(jsonify({"msg": "Internal Error"}), 500)
