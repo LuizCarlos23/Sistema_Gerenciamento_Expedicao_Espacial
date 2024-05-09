@@ -2,7 +2,6 @@ from datetime import datetime
 from flask import jsonify, make_response, request
 from flask_restful import Resource, reqparse
 from app.models.mission import Mission
-import json
 
 requestArgsPost = reqparse.RequestParser() #definir os argumentos da solicitação HTTP
 requestArgsPost.add_argument("name", type=str, help="Name of the mission", required=True)
