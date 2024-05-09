@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import jsonify, make_response
+from flask import jsonify, make_response, request
 from flask_restful import Resource, reqparse
 from app.models.mission import Mission
 import json
@@ -30,6 +30,7 @@ requestArgsUpdate.add_argument("status_description", type=str, help="Description
 requestArgsDelete = reqparse.RequestParser()
 requestArgsDelete.add_argument("id", type=str, help="Id of the mission", required=True)
 
+
 class MissionDetailView(Resource):
     def get(self, id):
         try:
@@ -59,8 +60,16 @@ class MissionDetailView(Resource):
 class MissionsView(Resource):
     def get(self):
         try:
-            missions = Mission.list(self)
+            missions = []
             serialized_missions = []
+
+            if (request.args.get("initialDate") is None or request.args.get("finalDate") is None):
+                missions = Mission.list(self)
+            else:
+                initialDate = datetime.strptime(request.args.get("initialDate"), "%d-%m-%Y")
+                finalDate = datetime.strptime(request.args.get("finalDate"), "%d-%m-%Y")
+                missions = Mission.listByDate(self, initialDate, finalDate) or []
+            
             for mission in missions:
                 serialized_mission = {
                     "id": mission.id,
@@ -72,10 +81,13 @@ class MissionsView(Resource):
                 serialized_missions.append(serialized_mission)
 
             return make_response(jsonify({"missions": serialized_missions}), 200)
+        except ValueError as e:
+            return make_response(jsonify({"msg": "Values not allowed"}), 400)
         except Exception as e:
             print("Ocorreu um error na listagem")
             print(e)
             return make_response(jsonify({"msg": "Internal Error"}), 500)
+
 
     def post(self):
         try:

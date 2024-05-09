@@ -39,6 +39,13 @@ class Mission(db.Model):
             return missions
         except Exception as e:
             print(e)
+        
+    def listByDate(self, initialDate, finalDate):
+        try:
+            missions = db.session.query(Mission).filter((Mission.launch_date >= initialDate) & (Mission.launch_date <= finalDate)).all()
+            return missions
+        except Exception as e:
+            print(e)
 
     def save(self, name, launch_date, destination, status, crew, payload, duration, cost, status_description):
         try:
