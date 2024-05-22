@@ -10,7 +10,7 @@ class Mission(db.Model):
     status = db.Column(db.String)
     crew = db.Column(db.String)
     payload = db.Column(db.String)
-    duration = db.Column(db.String)
+    duration = db.Column(db.DateTime)
     cost = db.Column(db.Numeric)
     status_description = db.Column(db.Text)
 

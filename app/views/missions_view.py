@@ -74,6 +74,7 @@ class MissionsView(Resource):
                     "id": mission.id,
                     "name": mission.name,
                     "launch_date": mission.launch_date.strftime("%d/%m/%Y"), 
+                    "duration": mission.duration.strftime("%d/%m/%Y %H:%M"), 
                     "destination": mission.destination,
                     "status": mission.status
                 }
@@ -91,10 +92,14 @@ class MissionsView(Resource):
     def post(self):
         try:
             data = requestArgsPost.parse_args()
-            datetime_str = data["launch_date"]
-            launch_date = datetime.strptime(datetime_str, "%d/%m/%Y")
+            launch_date = datetime.strptime(data["launch_date"], "%d/%m/%Y")
+            duration = datetime.strptime(data["duration"], "%d/%m/%Y %H:%M")
+
+            if (launch_date > duration):
+                return make_response(jsonify({"msg": "Launch date must be earlier than duration"}), 400)
+
             Mission.save(self, data["name"], launch_date, data["destination"], data["status"], 
-                                   data["crew"], data["payload"], data["duration"], data["cost"], data["status_description"])
+                                   data["crew"], data["payload"], duration, data["cost"], data["status_description"])
 
             return make_response(jsonify({"msg": "Mission create successfully!"}), 201)
         except Exception as e:
@@ -107,8 +112,9 @@ class MissionsView(Resource):
             data = requestArgsUpdate.parse_args()
             
             if (data["launch_date"] is not None):
-                datetime_str = data["launch_date"]
-                data["launch_date"] = datetime.strptime(datetime_str, "%d/%m/%Y")
+                data["launch_date"] = datetime.strptime(data["launch_date"], "%d/%m/%Y")
+            if (data["duration"] is not None):
+                data["duration"] = datetime.strptime(data["duration"], "%d/%m/%Y")
 
             # Pra remover os valores None do dicionario
             filtered = {k: v for k, v in data.items() if v is not None} 
