@@ -35,14 +35,14 @@ class Mission(db.Model):
 
     def list(self):
         try:
-            missions = db.session.query(Mission).all()
+            missions = db.session.query(Mission).order_by(Mission.launch_date.desc()).all()
             return missions
         except Exception as e:
             print(e)
         
     def listByDate(self, initialDate, finalDate):
         try:
-            missions = db.session.query(Mission).filter((Mission.launch_date >= initialDate) & (Mission.launch_date <= finalDate)).all()
+            missions = db.session.query(Mission).filter((Mission.launch_date >= initialDate) & (Mission.launch_date <= finalDate)).order_by(Mission.launch_date.desc()).all()
             return missions
         except Exception as e:
             print(e)
