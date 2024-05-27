@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/missoes.css">
+    <link rel="shortcut icon" href="../images/foguete_favicon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>SpaceOdyssey - Missões</title>
+</head>
+
+<body>
+
+    <header>
+        <div class="blocoDeConteudo">
+            <div class="logo">
+                <a href="home.html">SPACEODYSSEY</a>
+            </div>
+        
+            <div class="menu">
+                <a href="home.html">HOME</a>
+                <a href="missoes.html">MISSÕES</a>
+                <a href="sobre.html">SOBRE</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="blocoDeConteudo2">
+            <div class="topo">
+                <h1>Tabela de Missões</h1>
+            </div>
+
+            <div class="filtroDatas">
+                <div class="filtros">
+                    <label>Data de Inicio:</label>
+                    <input type="date" id="dataInicial">
+                </div>
+
+                <div class="filtros">
+                    <label>Data de Final:</label>
+                    <input type="date" id="dataFinal">
+                </div>
+
+                <div class="btnFiltro">
+                    <button id="btnFiltrar">FILTRAR</button>
+                </div>
+                <div class="btnFiltro">
+                    <button id="btnLimparFiltro">LIMPAR</button>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>NOME DA MISSÃO</th>
+                        <th>DATA DE LANÇAMENTO</th>
+                        <th>DESTINO</th>
+                        <th>DURAÇÃO</th>
+                        <th>ESTADO DA MISSÃO</th>
+                        <th>AÇÕES</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tBodyMissions">
+                </tbody>
+            </table>
+            <div id="info"></div>
+
+            <div class="btnCadastrar">
+                <button data-bs-toggle="modal" data-bs-target="#registerModal">CADASTRAR</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Register Mission Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModal" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Cadastrar Missão</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" id="formRegister">
+                        <div class="row g-2 mb-2">
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="missionName" placeholder="Nome">
+                                <label for="missionName">Nome</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="date" class="form-control" id="missionLaunchDate"
+                                    placeholder="Data lançamento">
+                                <label for="missionLaunchDate">Data Lançamento</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="missionDestination" placeholder="Destino" >
+                                <label for="missionDestination">Destino</label>
+                            </div>
+
+                            <div class="form-floating col">
+                                <select class="form-floating col form-select" id="missionStatus">
+                                    <option value="0" disabled selected>Selecione</option>
+                                    <option value="Ativada">Ativada</option>
+                                    <option value="Concluída">Concluída</option>
+                                    <option value="Abortada">Abortada</option>
+                                </select>
+                                <label for="missionStatus">Estado</label>
+                            </div>
+
+                            
+                        </div>
+
+                        <div class="row g-2 mb-2">
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="missionCrew" placeholder="Tripulação">
+                                <label for="missionCrew">Tripulação</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="missionPayload" placeholder="Carga util">
+                                <label for="missionPayload">Carga util</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="datetime" class="form-control" id="missionDuration" placeholder="Duração">
+                                <label for="missionDuration">Duração</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="number" class="form-control" id="missionCost" placeholder="Custo">
+                                <label for="missionCost">Custo</label>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-2">
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="missionStatusDescription"
+                                    placeholder="Status">
+                                <label for="missionStatusDescription">Status</label>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCloseRegisterModal" >Fechar</button>
+                    <button type="button" class="btn btn-primary" id="btnCadastrarMissao">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editar Mission Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModal" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Editar Missão</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" id="formEdit">
+                        <input type="number" hidden id="editMissionId">
+                        <div class="row g-2 mb-2">
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="editMissionName" placeholder="Nome">
+                                <label for="editMissionName">Nome</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="date" class="form-control" id="editMissionLaunchDate"
+                                    placeholder="Data lançamento">
+                                <label for="editMissionLaunchDate">Data Lançamento</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="editMissionDestination" placeholder="Destino">
+                                <label for="editMissionDestination">Destino</label>
+                            </div>
+                            <div class="form-floating col">
+                                <select class="form-floating col form-select" id="editMissionStatus">
+                                    <option value="0" disabled selected>Selecione</option>
+                                    <option value="Ativada">Ativada</option>
+                                    <option value="Concluída">Concluída</option>
+                                    <option value="Abortada">Abortada</option>
+                                </select>
+                                <label for="missionStatus">Estado</label>
+                            </div>
+
+                        </div>
+
+                        <div class="row g-2 mb-2">
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="editMissionCrew" placeholder="Tripulação">
+                                <label for="editMissionCrew">Tripulação</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="editMissionPayload" placeholder="Carga util">
+                                <label for="editMissionPayload">Carga util</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="datetime" class="form-control" id="editMissionDuration" placeholder="Duração">
+                                <label for="editMissionDuration">Duração</label>
+                            </div>
+                            <div class="form-floating col">
+                                <input type="number" class="form-control" id="editMissionCost" placeholder="Custo">
+                                <label for="editMissionCost">Custo</label>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-2">
+                            <div class="form-floating col">
+                                <input type="text" class="form-control" id="editMissionStatusDescription"
+                                    placeholder="Status">
+                                <label for="editMissionStatusDescription">Status</label>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnFecharEditModal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="btnEditarMissao">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer>
+        <span>SpaceOdyssey © | 2024</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="../js/index.js"></script>
+</body>
+</html>

@@ -40,12 +40,12 @@ class MissionDetailView(Resource):
             serialized_mission = {
                 "id": mission.id,
                 "name": mission.name,
-                "launch_date": mission.launch_date.strftime("%d/%m/%Y"), 
+                "launch_date": mission.launch_date.strftime("%Y-%m-%d"), 
                 "destination": mission.destination,
                 "status": mission.status,
                 "crew": mission.crew,
                 "payload": mission.payload,
-                "duration": mission.duration,
+                "duration": mission.duration.strftime("%Y-%m-%d %H:%M"),
                 "cost": float(mission.cost),
                 "status_description": mission.status_description
             }
@@ -65,16 +65,16 @@ class MissionsView(Resource):
             if (request.args.get("initialDate") is None or request.args.get("finalDate") is None):
                 missions = Mission.list(self)
             else:
-                initialDate = datetime.strptime(request.args.get("initialDate"), "%d-%m-%Y")
-                finalDate = datetime.strptime(request.args.get("finalDate"), "%d-%m-%Y")
+                initialDate = datetime.strptime(request.args.get("initialDate"), "%Y-%m-%d")
+                finalDate = datetime.strptime(request.args.get("finalDate"), "%Y-%m-%d")
                 missions = Mission.listByDate(self, initialDate, finalDate) or []
             
             for mission in missions:
                 serialized_mission = {
                     "id": mission.id,
                     "name": mission.name,
-                    "launch_date": mission.launch_date.strftime("%d/%m/%Y"), 
-                    "duration": mission.duration.strftime("%d/%m/%Y %H:%M"), 
+                    "launch_date": mission.launch_date.strftime("%Y-%m-%d"), 
+                    "duration": mission.duration.strftime("%Y-%m-%d %H:%M"), 
                     "destination": mission.destination,
                     "status": mission.status
                 }
@@ -92,9 +92,9 @@ class MissionsView(Resource):
     def post(self):
         try:
             data = requestArgsPost.parse_args()
-            launch_date = datetime.strptime(data["launch_date"], "%d/%m/%Y")
-            duration = datetime.strptime(data["duration"], "%d/%m/%Y %H:%M")
-
+            launch_date = datetime.strptime(data["launch_date"], "%Y-%m-%d")
+            duration = datetime.strptime(data["duration"], "%Y-%m-%d %H:%M")
+            
             if (launch_date > duration):
                 return make_response(jsonify({"msg": "Launch date must be earlier than duration"}), 400)
 
@@ -112,9 +112,9 @@ class MissionsView(Resource):
             data = requestArgsUpdate.parse_args()
             
             if (data["launch_date"] is not None):
-                data["launch_date"] = datetime.strptime(data["launch_date"], "%d/%m/%Y")
+                data["launch_date"] = datetime.strptime(data["launch_date"], "%Y-%m-%d")
             if (data["duration"] is not None):
-                data["duration"] = datetime.strptime(data["duration"], "%d/%m/%Y")
+                data["duration"] = datetime.strptime(data["duration"], "%Y-%m-%d %H:%M")
 
             # Pra remover os valores None do dicionario
             filtered = {k: v for k, v in data.items() if v is not None} 
@@ -122,7 +122,7 @@ class MissionsView(Resource):
             data.update(filtered)
 
             Mission.update(self, data["id"], data)
-            return make_response(jsonify({"msg": "Mission updated successfully!"}), 201)
+            return make_response(jsonify({"msg": "Mission updated successfully!"}), 200)
         except Exception as e:
             print("Ocorreu um error ao atualizar a missão")
             print(e)
